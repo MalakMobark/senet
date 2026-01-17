@@ -121,7 +121,6 @@ class Renderer:
                 stick_x = panel_x + 20 + i*45
                 base_stick_y = panel_y + 10
                 max_height = 70
-                
                 # --- منطق الفتلة الطولية ---
                 if self.is_shaking:
                     # نستخدم دالة الكوساين لتغيير الطول من -70 لـ 70 (دوران)
