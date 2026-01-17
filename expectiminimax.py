@@ -89,10 +89,8 @@ class Expectiminimax:
         # منطق الإجبار (Forced Moves) - يُنفذ قبل الخوارزمية
         # =================================================
         forced_moves = []
-
         # 1. إذا في حجر بالخانة 30، لازم يلعب فيه مشان يطلع (بأي رمية)
         for move_idx in legal_moves:
-            # نصل لموقع الحجر الحالي قبل الحركة من قائمة أحجار اللاعب الحالي
             current_pieces = state.black_pieces if state.turn == BLACK else state.white_pieces
             if current_pieces[move_idx] == 30:
                 forced_moves.append(move_idx)
@@ -102,17 +100,22 @@ class Expectiminimax:
             for move_idx in legal_moves:
                 current_pieces = state.black_pieces if state.turn == BLACK else state.white_pieces
                 if current_pieces[move_idx] == 26:
-                    # نتحقق أن الحركة تؤدي فعلياً للخروج (خارج الرقعة)
                     new_state = Move.apply(state, move_idx, roll)
                     old_exited = len(state.black_exited) if state.turn == BLACK else len(state.white_exited)
                     new_exited = len(new_state.black_exited) if state.turn == BLACK else len(new_state.white_exited)
                     if new_exited > old_exited:
                         forced_moves.append(move_idx)
 
-        # إذا تحقق أي من الشرطين، نحصر الخيارات بالحركات الإجبارية فقط ونلغي الباقي
+        # 3. الشرط الجديد: إذا في حجر بالخانة 25 والرمية 1، لازم يروح للخانة 26 حصراً
+        if not forced_moves and roll == 1:
+            for move_idx in legal_moves:
+                current_pieces = state.black_pieces if state.turn == BLACK else state.white_pieces
+                if current_pieces[move_idx] == 25:
+                    forced_moves.append(move_idx)
+
+        # إذا تحقق أي من الشروط، نحصر الخيارات بالحركات الإجبارية فقط
         if forced_moves:
             legal_moves = forced_moves
-        # =================================================
 
         # استكمال الخوارزمية بشكل طبيعي (سواء بالحركات الإجبارية أو بكل الحركات إذا لم يتوفر الشرط)
         if is_maximizing:
