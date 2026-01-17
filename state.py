@@ -19,7 +19,7 @@ class GameState:
 
         # الكمبيوتر = الأسود
         # self.black_pieces = [1, 3, 5, 7, 9, 11, 26]
-        self.black_pieces = [1, 3, 5, 7, 9, 11, 25]
+        self.black_pieces = [1, 3, 5, 7, 9, 11, 13]
 
         # الأحجار الخارجة من الرقعة
         self.white_exited = []  # الأحجار البيضاء الخارجة
