@@ -84,6 +84,23 @@ class Expectiminimax:
             new_state.switch_turn()
             val, _ = self.decide(new_state, depth - 1, not is_maximizing, None)
             return val, None
+        
+
+
+                # استبعاد حجر الخانة 26 إذا الرمية 1 أو 2 أو 3، بشرط وجود خيارات أخرى
+        if roll in (1, 2, 3):
+            current_pieces = state.black_pieces if state.turn == BLACK else state.white_pieces
+
+            # كل الحركات التي ليست من الخانة 26
+            non_26_moves = [
+                move_idx for move_idx in legal_moves
+                if current_pieces[move_idx] != 26
+            ]
+
+            # إذا في حركات بديلة، نلعب بها ونتجاهل حجر 26
+            if non_26_moves:
+                legal_moves = non_26_moves
+
 
         # =================================================
         # منطق الإجبار (Forced Moves) - يُنفذ قبل الخوارزمية
@@ -96,22 +113,21 @@ class Expectiminimax:
                 forced_moves.append(move_idx)
 
         # 2. إذا في حجر بالخانة 26 والرمية 5، لازم يلعب فيه مشان يطلع
-        if not forced_moves and roll == 5:
+        
+
+        # 2. إذا في حجر بالخانة 26 والرمية 4 أو 5، لازم يلعب فيه (إجباري دائماً)
+        if not forced_moves and roll in (4, 5):
             for move_idx in legal_moves:
                 current_pieces = state.black_pieces if state.turn == BLACK else state.white_pieces
                 if current_pieces[move_idx] == 26:
-                    new_state = Move.apply(state, move_idx, roll)
-                    old_exited = len(state.black_exited) if state.turn == BLACK else len(state.white_exited)
-                    new_exited = len(new_state.black_exited) if state.turn == BLACK else len(new_state.white_exited)
-                    if new_exited > old_exited:
-                        forced_moves.append(move_idx)
-
-        # 3. الشرط الجديد: إذا في حجر بالخانة 25 والرمية 1، لازم يروح للخانة 26 حصراً
-        if not forced_moves and roll == 1:
-            for move_idx in legal_moves:
-                current_pieces = state.black_pieces if state.turn == BLACK else state.white_pieces
-                if current_pieces[move_idx] == 25:
                     forced_moves.append(move_idx)
+
+        if not forced_moves:
+            current_pieces = state.black_pieces if state.turn == BLACK else state.white_pieces
+            for move_idx in legal_moves:
+                if current_pieces[move_idx] + roll == HOUSE_OF_HAPPINESS:
+                    forced_moves.append(move_idx)
+
 
         # إذا تحقق أي من الشروط، نحصر الخيارات بالحركات الإجبارية فقط
         if forced_moves:
